@@ -2,36 +2,75 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import Message from "./Message";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const ChatBox = () => {
-    const containerRef=useRef(null);
-  const { selectedChat, theme } = useAppContext();
-  const [messages, setMessages] = useState([]);
+  const containerRef = useRef(null);
+  const { selectedChat, theme, token, setUser, user } = useAppContext();
+  const [message, setMessage] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [promt, setPromt] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [mode, setMode] = useState("text");
   const [isPublished, setIsPublished] = useState(false);
   const onSubmint = async (e) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+      if (!user) return toast("Login to send message");
+      setLoading(true);
+      const promptCopy = prompt;
+      setPrompt("");
+      setMessage((prev) => [
+        ...prev,
+        {
+          role: "user",
+          content: prompt,
+          timestamp: Date.now(),
+          isImage: false,
+        },
+      ]);
+      const { data } = await axios.post(
+        `/api/message/${mode}`,
+        { chatId: selectedChat._id, prompt, isPublished },
+        { headers: { Authorization: token } }
+      );
+      if (data.success) {
+        setMessage((prev) => [...prev, data.reply]);
+        // decrease Credits
+        if (mode === "image") {
+          setUser((prev) => ({ ...prev, credits: prev.credits - 2 }));
+        } else {
+          setUser((prev) => ({ ...prev, credits: prev.credits - 1 }));
+        }
+      }else{
+        toast.error(data.message);
+        setPrompt(promptCopy)
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }finally{
+      setPrompt("");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (selectedChat) {
-      setMessages(selectedChat.messages);
+      setMessage(selectedChat.message);
     }
   }, [selectedChat]);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     containerRef.current.scrollTo({
-        top:containerRef.current.scrollHeight,
-        behavior:"smooth",
-    })
-  },[messages])
+      top: containerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [message]);
   return (
     <div className="flex-1 flex flex-col justify-between m-5 md:m-10 xl:mx-32 max-md:mt-14 2xl:pr-40">
       {/* Chat Messages */}
       <div ref={containerRef} className="flex-1 mb-5 overflow-y-scroll">
-        {messages.length === 0 && (
+        {message.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center gap-2 text-primary">
             <img
               className="w-full max-w-56 sm:max-w-64"
@@ -45,7 +84,7 @@ const ChatBox = () => {
           </div>
         )}
 
-        {messages.map((message, index) => (
+        {message.map((message, index) => (
           <Message key={index} message={message} />
         ))}
 
@@ -92,7 +131,7 @@ const ChatBox = () => {
           </option>
         </select>
         <input
-          onChange={(e) => setPromt(e.target.value)}
+          onChange={(e) => setPrompt(e.target.value)}
           value={prompt}
           type="text"
           name=""
