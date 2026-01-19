@@ -97,7 +97,7 @@ This project is designed to feel like a **real-world production-ready AI platfor
 
 
 <p align="center">
-<img src="./screenshots/image-generator.png" width="45%" />
+<img src="./screenshots/image-generate.png" width="45%" />
 <img src="./screenshots/pricing.png" width="45%" />
 </p>
 
