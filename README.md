@@ -90,7 +90,16 @@ This project is designed to feel like a **real-world production-ready AI platfor
 
 ## 📸 Screenshots (Optional)
 
-> Add screenshots or demo GIFs here for better presentation
+<p align="center">
+<img src="./screenshots/home.png" width="45%" />
+<img src="./screenshots/chat.png" width="45%" />
+</p>
+
+
+<p align="center">
+<img src="./screenshots/image-generator.png" width="45%" />
+<img src="./screenshots/pricing.png" width="45%" />
+</p>
 
 ---
 
