@@ -88,7 +88,7 @@ This project is designed to feel like a **real-world production-ready AI platfor
 
 ---
 
-## 📸 Screenshots (Optional)
+## 📸 Screenshots
 
 <p align="center">
 <img src="./screenshots/home.png" width="45%" />
